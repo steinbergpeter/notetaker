@@ -21,6 +21,14 @@
       "~/*": ["./src/*"]
     }
   },
+  "images": {
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "**"
+      }
+    ]
+  },
   "include": [
     ".eslintrc.cjs",
     "next-env.d.ts",
