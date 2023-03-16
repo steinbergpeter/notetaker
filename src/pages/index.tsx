@@ -1,9 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Header from "~/components/Header";
-import Content from "~/components/Content";
+import { Header } from "../components/Header";
+import Topics from "~/components/Topics";
+import Notes from "~/components/Notes";
 
-const Home: NextPage = () => {
+const Home: NextPage = ({}) => {
   return (
     <>
       <Head>
@@ -13,7 +14,10 @@ const Home: NextPage = () => {
       </Head>
       <main>
         <Header />
-        <Content />
+        <div className="mx-5 mt-5 grid grid-cols-4 gap-2 ">
+          <Topics />
+          <Notes />
+        </div>
       </main>
     </>
   );
