@@ -3,7 +3,8 @@ import { useState, type FC } from "react";
 import { useSession } from "next-auth/react";
 import { api, type RouterOutputs } from "../utils/api";
 import { NoteEditor } from "./NoteEditor";
-import { NoteCard } from "./NoteCard";
+// import { NoteCard } from "./NoteCard";
+import NoteCardList from "./NoteCardList";
 
 type Topic = RouterOutputs["topic"]["getAll"][0];
 
@@ -40,25 +41,14 @@ const Notes: FC = () => {
     },
   });
 
-  ///// DELETE NOTE
-  const deleteNote = api.note.delete.useMutation({
-    onSuccess: () => {
-      void refetchNotes();
-    },
-  });
+
 
   return (
     <div className="col-span-3">
-      <div>
-        {notes?.map((note) => (
-          <div key={note.id} className="mt-5">
-            <NoteCard
-              note={note}
-              onDelete={() => void deleteNote.mutate({ id: note.id })}
-            />
-          </div>
-        ))}
-      </div>
+      <NoteCardList
+        selectedTopic={selectedTopic}
+        setSelectedTopic={setSelectedTopic}
+      />
 
       <NoteEditor
         onSave={({ title, content }) => {

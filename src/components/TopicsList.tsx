@@ -1,23 +1,24 @@
-import { useState, type FC, type MouseEvent } from "react";
+import type { FC, MouseEvent, SetStateAction, Dispatch } from "react";
 import { useSession } from "next-auth/react";
 import { api, type RouterOutputs } from "../utils/api";
 
 type Topic = RouterOutputs["topic"]["getAll"][0];
 
-const TopicsList: FC = () => {
-  const { data: sessionData } = useSession();
+interface Props {
+  selectedTopic: Topic | null;
+  setSelectedTopic: Dispatch<SetStateAction<Topic | null>>;
+}
 
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
+const TopicsList: FC<Props> = ({ selectedTopic, setSelectedTopic }) => {
+  const { data: sessionData } = useSession();
 
   const handleSelectTopic = (
     e: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>,
     topic: Topic
   ) => {
-    e.preventDefault();
     setSelectedTopic(topic);
   };
 
-  ///// GET TOPICS
   const { data: topics } = api.topic.getAll.useQuery(
     undefined, // no input
     {
@@ -32,7 +33,15 @@ const TopicsList: FC = () => {
     <ul className="menu rounded-box w-56 bg-base-100 p-2">
       {topics?.map((topic) => (
         <li key={topic.id}>
-          <a href="#" onClick={(e) => handleSelectTopic(e, topic)}>
+          <a
+            className={
+              topic.id === selectedTopic?.id
+                ? "bg-blue-800 text-white"
+                : " bg-white hover:bg-blue-200"
+            }
+            href="#"
+            onClick={(e) => handleSelectTopic(e, topic)}
+          >
             {topic.title}
           </a>
         </li>

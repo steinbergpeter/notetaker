@@ -1,14 +1,28 @@
 import { api, type RouterOutputs } from "../utils/api";
-import { useState, type FC } from "react";
+import type {
+  ChangeEvent,
+  FormEvent,
+  FC,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 
 type Topic = RouterOutputs["topic"]["getAll"][0];
 
-const TopicEditor: FC = () => {
+interface Props {
+  selectedTopic: Topic | null;
+  setSelectedTopic: Dispatch<SetStateAction<Topic | null>>;
+}
+
+const TopicEditor: FC<Props> = ({ selectedTopic, setSelectedTopic }) => {
   const { data: sessionData } = useSession();
+  const [newTopic, setNewTopic] = useState("");
 
-  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-
+  const onTopicInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewTopic(e.target.value);
+  };
   ///// GET TOPICS
   const { refetch: refetchTopics } = api.topic.getAll.useQuery(
     undefined, // no input
@@ -20,27 +34,30 @@ const TopicEditor: FC = () => {
     }
   );
 
-  ///// CREATE TOPIC
   const createTopic = api.topic.create.useMutation({
     onSuccess: () => {
       void refetchTopics();
     },
   });
 
+  const submitNewTopic = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    createTopic.mutate({
+      title: newTopic,
+    });
+    setNewTopic("");
+  };
+
   return (
-    <input
-      type="text"
-      placeholder="New Topic"
-      className="input-bordered input input-sm w-full"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          createTopic.mutate({
-            title: e.currentTarget.value,
-          });
-          e.currentTarget.value = "";
-        }
-      }}
-    />
+    <form onSubmit={submitNewTopic}>
+      <input
+        type="text"
+        placeholder="New Topic"
+        className="input-bordered input input-sm w-full"
+        value={newTopic}
+        onChange={onTopicInputChange}
+      />
+    </form>
   );
 };
 
